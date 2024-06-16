@@ -1,6 +1,6 @@
 {
   "functions": {
-    "server/api/create-schej-event.post.ts": {
+    "/server/api/create-schej-event.post.ts": {
       "maxDuration": 60
     }
   }
