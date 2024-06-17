@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
   }, groupGridElement);
 
   // Fix dates
-  data.dates = JSON.parse(data.dates).map((d: string) => new Date(d));
+  data.dates = JSON.parse(data.dates).map((d: string) => new Date(d).getTime());
 
   //
   // Get event name
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
   const availableElement = await page.$("#Available");
   for (const date of data.dates) {
     for (
-      let i = 0, curDate = date;
+      let i = 0, curDate = new Date(date);
       i < data.duration * 4;
       i++, curDate.setMinutes(curDate.getMinutes() + 15)
     ) {
@@ -93,7 +93,44 @@ export default defineEventHandler(async (event) => {
   }
   data.availability = availability;
 
+  // TODO: NEED TO DETERMINE TYPE (specific dates vs dow)
+  // Create schej event
+  const createEventPayload = {
+    name: data.name,
+    duration: data.duration,
+    dates: data.dates.map((d: number) => new Date(d)),
+    notificationsEnabled: false,
+    blindAvailabilityEnabled: false,
+    daysOnly: false,
+    type: "specific_dates",
+  };
+  const createEventResponse: { eventId: string; shortId: string } =
+    await $fetch("http://localhost:3002/events", {
+      method: "POST",
+      body: createEventPayload,
+    });
+  const { shortId } = createEventResponse;
+  console.log("event created");
+
+  // Populate responses
+  for (const name of Object.keys(data.availability)) {
+    const addResponsePayload = {
+      guest: true,
+      name: name,
+      availability: data.availability[name].map((d: number) => new Date(d)),
+    };
+
+    const response = await $fetch(
+      `http://localhost:3002/events/${shortId}/response`,
+      {
+        method: "POST",
+        body: addResponsePayload,
+      }
+    );
+    console.log("added availability for ", name);
+  }
+
   return {
-    ...data,
+    url: `http://localhost:8080/e/${shortId}`,
   };
 });

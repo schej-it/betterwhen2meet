@@ -20,6 +20,8 @@ onMounted(async () => {
   console.log(data);
 
   timeTook.value = (end - start) / 1000;
+
+  window.location.href = data.url;
 });
 </script>
 
