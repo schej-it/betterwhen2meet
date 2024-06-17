@@ -93,6 +93,16 @@ export default defineEventHandler(async (event) => {
   }
   data.availability = availability;
 
+  // Get base url
+  const baseApiUrl =
+    process.env.VERCEL_ENV === "production"
+      ? "https://schej.it/api"
+      : "http://localhost:3002";
+  const baseSchejUrl =
+    process.env.VERCEL_ENV === "production"
+      ? "https://schej.it"
+      : "http://localhost:8080";
+
   // TODO: NEED TO DETERMINE TYPE (specific dates vs dow)
   // Create schej event
   const createEventPayload = {
@@ -105,12 +115,11 @@ export default defineEventHandler(async (event) => {
     type: "specific_dates",
   };
   const createEventResponse: { eventId: string; shortId: string } =
-    await $fetch("http://localhost:3002/events", {
+    await $fetch(`${baseApiUrl}/events`, {
       method: "POST",
       body: createEventPayload,
     });
   const { shortId } = createEventResponse;
-  console.log("event created");
 
   // Populate responses
   for (const name of Object.keys(data.availability)) {
@@ -120,17 +129,13 @@ export default defineEventHandler(async (event) => {
       availability: data.availability[name].map((d: number) => new Date(d)),
     };
 
-    const response = await $fetch(
-      `http://localhost:3002/events/${shortId}/response`,
-      {
-        method: "POST",
-        body: addResponsePayload,
-      }
-    );
-    console.log("added availability for ", name);
+    const response = await $fetch(`${baseApiUrl}/events/${shortId}/response`, {
+      method: "POST",
+      body: addResponsePayload,
+    });
   }
 
   return {
-    url: `http://localhost:8080/e/${shortId}`,
+    url: `${baseSchejUrl}/e/${shortId}`,
   };
 });
