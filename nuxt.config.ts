@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       posthogPublicKey: "phc_pz4u2FxpKnE15iVzI7fRYe9QClKm0tI9xVtkCVioThk",
-      posthogHost: "https://betterwhen2meet.com/ingest",
+      posthogHost: "https://www.betterwhen2meet.com/ingest",
     },
   },
   routeRules: {
