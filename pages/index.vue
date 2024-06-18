@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Rive } from "@rive-app/canvas";
-const route = useRoute();
 
+const route = useRoute();
 if (route.fullPath === "/") {
   navigateTo("https://schej.it", { external: true });
 }
@@ -76,7 +76,7 @@ onBeforeUnmount(() => {
       </template>
       <div class="text-lg mt-20 flex items-center gap-2">
         <div>Powered by</div>
-        <a href="https://schej.it">
+        <a href="https://schej.it" target="_blank">
           <img class="h-6" src="/public/img/schej_logo_with_text.png" />
         </a>
       </div>
