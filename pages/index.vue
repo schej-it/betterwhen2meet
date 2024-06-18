@@ -17,7 +17,7 @@ onMounted(async () => {
     data = await $fetch("/api/create-schej-event", {
       method: "POST",
       body: {
-        href: route.fullPath,
+        href: `?${Object.keys(route.query)[0]}`,
         timezoneOffset: new Date().getTimezoneOffset(),
       },
     });
