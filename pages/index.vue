@@ -2,14 +2,19 @@
 import { Rive } from "@rive-app/canvas";
 const route = useRoute();
 
+if (route.fullPath === "/") {
+  navigateTo("https://schej.it", { external: true });
+}
+
 const loaded = ref(false);
 const timeTook = ref(0);
 const error = ref("");
 
 onMounted(async () => {
   const start = new Date().getTime();
+  let data;
   try {
-    const data = await $fetch("/api/create-schej-event", {
+    data = await $fetch("/api/create-schej-event", {
       method: "POST",
       body: {
         href: route.fullPath,
@@ -27,7 +32,9 @@ onMounted(async () => {
   timeTook.value = (end - start) / 1000;
   console.log(`Took ${timeTook.value}s to parse when2meet!`);
 
-  window.location.href = data.url;
+  if (data) {
+    window.location.href = data.url;
+  }
 });
 
 // Rive stuff
