@@ -4,16 +4,23 @@ const route = useRoute();
 
 const loaded = ref(false);
 const timeTook = ref(0);
+const error = ref("");
 
 onMounted(async () => {
   const start = new Date().getTime();
-  const data = await $fetch("/api/create-schej-event", {
-    method: "POST",
-    body: {
-      href: route.fullPath,
-      timezoneOffset: new Date().getTimezoneOffset(),
-    },
-  });
+  try {
+    const data = await $fetch("/api/create-schej-event", {
+      method: "POST",
+      body: {
+        href: route.fullPath,
+        timezoneOffset: new Date().getTimezoneOffset(),
+      },
+    });
+  } catch (e) {
+    error.value =
+      "Failed to generate a better when2meet! Make sure the ID is formatted correctly";
+    return;
+  }
   const end = new Date().getTime();
   loaded.value = true;
 
@@ -53,8 +60,13 @@ onBeforeUnmount(() => {
         class="transition-opacity duration-300 -mb-6"
         :class="riveLoaded ? 'opacity-100' : 'opacity-0'"
       ></canvas>
-      <div class="text-3xl font-medium">Creating a better when2meet...</div>
-      <AnimatedProgressBar :loaded="loaded" />
+      <template v-if="!error">
+        <div class="text-3xl font-medium">Creating a better when2meet...</div>
+        <AnimatedProgressBar :loaded="loaded" />
+      </template>
+      <template v-else>
+        <div class="text-red">{{ error }}</div>
+      </template>
       <div class="text-lg mt-20 flex items-center gap-2">
         <div>Powered by</div>
         <a href="https://schej.it">

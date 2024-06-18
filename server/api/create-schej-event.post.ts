@@ -57,6 +57,12 @@ export default defineEventHandler(async (event) => {
   //
   const groupGridElement = await page.$("#GroupGridSlots");
 
+  if (!groupGridElement) {
+    setResponseStatus(event, 400, "Invalid when2meet event id");
+    event.node.res.end();
+    return;
+  }
+
   // @ts-ignore
   const data = await page.evaluate((groupGrid: HTMLElement) => {
     const duration = groupGrid.children.length / 4;
