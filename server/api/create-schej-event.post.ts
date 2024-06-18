@@ -1,6 +1,7 @@
 import puppeteerCore from "puppeteer-core";
 import puppeteer from "puppeteer";
 import chromium from "@sparticuz/chromium";
+import { PostHog } from "posthog-node";
 
 /** Get the correct browser depending on if we're running in production
  *  Source: https://gist.github.com/kettanaito/56861aff96e6debc575d522dd03e5725
@@ -41,6 +42,30 @@ function convertToDowDate(d: number, timezoneOffset: number) {
   date.setMinutes(date.getMinutes() + minutes);
 
   return date;
+}
+
+async function trackEventWithPosthog(event: any, posthogPayload: any) {
+  const runtimeConfig = useRuntimeConfig();
+  const cookieString = event.node.req.headers.cookie || "";
+  const cookieName = `ph_${runtimeConfig.public.posthogPublicKey}_posthog`;
+  const cookieMatch = cookieString.match(new RegExp(cookieName + "=([^;]+)"));
+
+  let distinctId;
+  if (cookieMatch) {
+    const parsedValue = JSON.parse(decodeURIComponent(cookieMatch[1]));
+    if (parsedValue && parsedValue.distinct_id) {
+      distinctId = parsedValue.distinct_id;
+      const posthog = new PostHog(runtimeConfig.public.posthogPublicKey, {
+        host: runtimeConfig.public.posthogHost,
+      });
+      posthog.capture({
+        distinctId: distinctId,
+        event: "Event created",
+        properties: posthogPayload,
+      });
+      await posthog.shutdown();
+    }
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -177,6 +202,16 @@ export default defineEventHandler(async (event) => {
       body: addResponsePayload,
     });
   }
+
+  const posthogPayload = {
+    eventId: shortId,
+    eventName: createEventPayload.name,
+    eventDuration: createEventPayload.duration,
+    eventDates: JSON.stringify(createEventPayload.dates),
+    eventType: createEventPayload.type,
+    eventWhen2meetHref: href,
+  };
+  trackEventWithPosthog(event, posthogPayload);
 
   return {
     url: `${baseSchejUrl}/e/${shortId}`,
