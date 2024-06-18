@@ -22,9 +22,30 @@ async function getBrowser() {
   }
 }
 
+/** Convert the given when2meet dow date schej dow date */
+function convertToDowDate(d: number, timezoneOffset: number) {
+  const date = new Date(d);
+
+  // when2meet Sunday: 1978-11-12
+  // Schej Sunday: 2018-06-17
+  // Change when2meet sunday to Schej sunday
+  const day = date.getUTCDay();
+  date.setUTCFullYear(2018);
+  date.setUTCMonth(5);
+  date.setUTCDate(17 + day);
+
+  // Change to correct timezone
+  const hours = Math.floor(timezoneOffset / 60);
+  const minutes = timezoneOffset % 60;
+  date.setHours(date.getHours() + hours);
+  date.setMinutes(date.getMinutes() + minutes);
+
+  return date;
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const href = body.href;
+  const { href, timezoneOffset } = body;
 
   const browser = await getBrowser();
   const page = await browser.newPage();
@@ -92,6 +113,12 @@ export default defineEventHandler(async (event) => {
     }
   }
   data.availability = availability;
+  data.type = "specific_dates";
+
+  // Determine if days of the week event
+  if (new Date(data.dates[0]).getFullYear() === 1978) {
+    data.type = "dow";
+  }
 
   // Get base url
   const baseApiUrl =
@@ -108,11 +135,16 @@ export default defineEventHandler(async (event) => {
   const createEventPayload = {
     name: data.name,
     duration: data.duration,
-    dates: data.dates.map((d: number) => new Date(d)),
+    dates: data.dates.map((d: number) => {
+      if (data.type === "dow") {
+        return convertToDowDate(d, timezoneOffset);
+      }
+      return new Date(d);
+    }),
     notificationsEnabled: false,
     blindAvailabilityEnabled: false,
     daysOnly: false,
-    type: "specific_dates",
+    type: data.type,
   };
   const createEventResponse: { eventId: string; shortId: string } =
     await $fetch(`${baseApiUrl}/events`, {
@@ -126,7 +158,12 @@ export default defineEventHandler(async (event) => {
     const addResponsePayload = {
       guest: true,
       name: name,
-      availability: data.availability[name].map((d: number) => new Date(d)),
+      availability: data.availability[name].map((d: number) => {
+        if (data.type === "dow") {
+          return convertToDowDate(d, timezoneOffset);
+        }
+        return new Date(d);
+      }),
     };
 
     const response = await $fetch(`${baseApiUrl}/events/${shortId}/response`, {

@@ -13,7 +13,10 @@ onMounted(async () => {
   const start = new Date().getTime();
   const data = await $fetch("/api/create-schej-event", {
     method: "POST",
-    body: { href: route.fullPath },
+    body: {
+      href: route.fullPath,
+      timezoneOffset: new Date().getTimezoneOffset(),
+    },
   });
   const end = new Date().getTime();
   loading.value = false;
