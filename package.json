@@ -10,6 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.0",
+    "@rive-app/canvas": "^2.17.3",
     "@sparticuz/chromium": "^123.0.1",
     "nuxt": "^3.12.1",
     "puppeteer": "^22.11.0",

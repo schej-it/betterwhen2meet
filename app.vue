@@ -1,13 +1,18 @@
 <template>
-  <div>
-    <NuxtPage />
-  </div>
+  <NuxtPage />
 </template>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 
 * {
   font-family: "DM Sans", sans-serif;
+}
+
+html,
+body,
+#__nuxt,
+#__layout {
+  height: 100%;
 }
 </style>
