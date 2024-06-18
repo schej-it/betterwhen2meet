@@ -136,7 +136,6 @@ export default defineEventHandler(async (event) => {
       ? "https://schej.it"
       : "http://localhost:8080";
 
-  // TODO: NEED TO DETERMINE TYPE (specific dates vs dow)
   // Create schej event
   const createEventPayload = {
     name: data.name,
