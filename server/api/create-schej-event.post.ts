@@ -149,7 +149,7 @@ export default defineEventHandler(async (event) => {
     notificationsEnabled: false,
     blindAvailabilityEnabled: false,
     daysOnly: false,
-    fromWhen2meet: true,
+    when2meetHref: href,
     type: data.type,
   };
   const createEventResponse: { eventId: string; shortId: string } =
