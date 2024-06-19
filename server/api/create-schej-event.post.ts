@@ -77,9 +77,7 @@ export default defineEventHandler(async (event) => {
 
   await page.goto(`https://when2meet.com${href}`);
 
-  //
-  // Get event details (dates, duration)
-  //
+  // Check if group grid exists
   const groupGridElement = await page.$("#GroupGridSlots");
 
   if (!groupGridElement) {
@@ -89,61 +87,51 @@ export default defineEventHandler(async (event) => {
   }
 
   // @ts-ignore
-  const data = await page.evaluate((groupGrid: HTMLElement) => {
-    const duration = groupGrid.children.length / 4;
+  const data = await page.evaluate(() => {
+    // Get date and duration
+    const groupGrid = document.getElementById("GroupGridSlots");
+    const duration = groupGrid!.children.length / 4;
     const dates = [];
-    for (const col of groupGrid.children[0].children) {
-      dates.push(new Date(parseInt(col.getAttribute("data-time") + "000")));
+    for (const col of groupGrid!.children[0].children) {
+      dates.push(
+        new Date(parseInt(col.getAttribute("data-time") + "000")).getTime()
+      );
     }
-    return { dates: JSON.stringify(dates), duration };
-  }, groupGridElement);
 
-  // Fix dates
-  data.dates = JSON.parse(data.dates).map((d: string) => new Date(d).getTime());
+    // Get event name
+    const name = document
+      .getElementById("NewEventNameDiv")!
+      .innerHTML.split("<br>")[0]
+      .trim();
 
-  //
-  // Get event name
-  //
-  const eventNameElement = await page.$("#NewEventNameDiv");
-  // @ts-ignore
-  const eventName = await page.evaluate((eventNameEl: HTMLElement) => {
-    return eventNameEl.innerHTML.split("<br>")[0].trim();
-  }, eventNameElement);
-  data.name = eventName;
+    // Get availability
+    const availableEl = document.getElementById("Available");
+    const availability: { [key: string]: number[] } = {};
+    for (const date of dates) {
+      for (
+        let i = 0, curDate = new Date(date);
+        i < duration * 4;
+        i++, curDate.setMinutes(curDate.getMinutes() + 15)
+      ) {
+        // @ts-ignore
+        ShowSlot(curDate.getTime() / 1000, "");
 
-  //
-  // Get map mapping name to available times
-  //
-  const availability: { [key: string]: number[] } = {};
-  const availableElement = await page.$("#Available");
-  for (const date of data.dates) {
-    for (
-      let i = 0, curDate = new Date(date);
-      i < data.duration * 4;
-      i++, curDate.setMinutes(curDate.getMinutes() + 15)
-    ) {
-      const groupTime = await page.$(`#GroupTime${curDate.getTime() / 1000}`);
-
-      // @ts-ignore
-      await groupTime.hover();
-
-      // @ts-ignore
-      const available = await page.evaluate((availableEl: HTMLElement) => {
-        const available = availableEl.innerHTML.split("<br>");
+        const available = availableEl!.innerHTML.split("<br>");
         available.splice(-1);
-        return available;
-      }, availableElement);
 
-      for (const name of available) {
-        if (name in availability) {
-          availability[name].push(curDate.getTime());
-        } else {
-          availability[name] = [curDate.getTime()];
+        for (const name of available) {
+          if (name in availability) {
+            availability[name].push(curDate.getTime());
+          } else {
+            availability[name] = [curDate.getTime()];
+          }
         }
       }
     }
-  }
-  data.availability = availability;
+
+    return { dates, duration, name, availability };
+  });
+
   data.type = "specific_dates";
 
   // Determine if days of the week event
