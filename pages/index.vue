@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex justify-center items-center h-full">
-    <div class="flex flex-col items-center gap-6 text-center -mt-[15vh]">
+    <div class="flex flex-col items-center gap-6 text-center -mt-[15vh] p-4">
       <canvas
         id="canvas"
         width="300"

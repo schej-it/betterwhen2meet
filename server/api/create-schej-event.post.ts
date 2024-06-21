@@ -143,7 +143,7 @@ export default defineEventHandler(async (event) => {
   const baseApiUrl =
     process.env.VERCEL_ENV === "production"
       ? "https://schej.it/api"
-      : "http://localhost:3002";
+      : "http://localhost:3002/api";
   const baseSchejUrl =
     process.env.VERCEL_ENV === "production"
       ? "https://schej.it"
