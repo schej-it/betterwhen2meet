@@ -100,6 +100,11 @@ export default defineEventHandler(async (event) => {
   }
 
   console.log("GROUP GRID ELEMENT", groupGridElement);
+  // @ts-ignore
+  const groupGridHtml = await page.evaluate(() => {
+    return document.getElementById("GroupGridSlots")!.innerHTML;
+  });
+  console.log("GROUP GRID HTML", groupGridHtml);
 
   // @ts-ignore
   const data = await page.evaluate(() => {
