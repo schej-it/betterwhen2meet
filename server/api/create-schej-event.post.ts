@@ -77,6 +77,19 @@ export default defineEventHandler(async (event) => {
 
   await page.goto(`https://when2meet.com${href}`);
 
+  // Set a timeout for waiting (e.g., 10 seconds)
+  const waitOptions = { timeout: 10000 };
+
+  try {
+    await page.waitForSelector("#NewEventNameDiv", waitOptions);
+    await page.waitForSelector("#Available", waitOptions);
+    await page.waitForSelector("#GroupGridSlots", waitOptions);
+  } catch (error) {
+    setResponseStatus(event, 400, "Invalid when2meet event id");
+    event.node.res.end();
+    return;
+  }
+
   // Check if group grid exists
   const groupGridElement = await page.$("#GroupGridSlots");
 
