@@ -145,6 +145,8 @@ export default defineEventHandler(async (event) => {
     return { dates, duration, name, availability };
   });
 
+  console.log("DATA: ", data);
+
   data.type = "specific_dates";
 
   // Determine if days of the week event
