@@ -99,6 +99,8 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  console.log("GROUP GRID ELEMENT", groupGridElement);
+
   // @ts-ignore
   const data = await page.evaluate(() => {
     // Get date and duration
