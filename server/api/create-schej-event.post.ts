@@ -110,9 +110,18 @@ export default defineEventHandler(async (event) => {
   const data = await page.evaluate(() => {
     // Get date and duration
     const groupGrid = document.getElementById("GroupGridSlots");
-    const duration = groupGrid!.children.length / 4;
+    const numRows = [...groupGrid!.children].filter(
+      (c) => c.children.length > 0
+    ).length;
+    const duration = numRows / 4;
     const dates = [];
-    for (const col of groupGrid!.children[0].children) {
+
+    // Get the first row where there is a child with an id
+    const firstRowIndex = [...groupGrid!.children].findIndex((c) =>
+      Boolean(c.children[0]?.id)
+    );
+    for (const col of groupGrid!.children[firstRowIndex].children) {
+      if (!col.id) continue;
       dates.push(
         new Date(parseInt(col.getAttribute("data-time") + "000")).getTime()
       );
