@@ -173,11 +173,11 @@ export default defineEventHandler(async (event) => {
   // Get base url
   const baseApiUrl =
     process.env.VERCEL_ENV === "production"
-      ? "https://schej.it/api"
+      ? "https://timeful.app/api"
       : "http://localhost:3002/api";
-  const baseSchejUrl =
+  const baseTimefulUrl =
     process.env.VERCEL_ENV === "production"
-      ? "https://schej.it"
+      ? "https://timeful.app"
       : "http://localhost:8080";
 
   // Create schej event
@@ -233,6 +233,6 @@ export default defineEventHandler(async (event) => {
   trackEventWithPosthog(event, posthogPayload);
 
   return {
-    url: `${baseSchejUrl}/e/${shortId}`,
+    url: `${baseTimefulUrl}/e/${shortId}`,
   };
 });

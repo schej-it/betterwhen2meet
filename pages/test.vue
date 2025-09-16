@@ -37,8 +37,8 @@ onBeforeUnmount(() => {
       <AnimatedProgressBar :loaded="loaded" />
       <div class="text-lg mt-20 flex items-center gap-2">
         <div>Powered by</div>
-        <a href="https://schej.it">
-          <img class="h-6" src="/public/img/schej_logo_with_text.png" />
+        <a href="https://timeful.app">
+          <img class="h-6" src="/public/img/timeful_logo_with_text.png" />
         </a>
       </div>
     </div>
